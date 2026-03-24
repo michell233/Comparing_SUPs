@@ -74,7 +74,6 @@ out_simple <- result_simpleheuristic %>%
 
 out_simple <- as.data.frame(out_simple)
 
-
 #Run GAUSS to calculate "up" and "lo" as given by the simple_heuristic SUP
 out_simple_2 <- SuppressDominantCells(data=df_microdata,
                                       numVar = "response",
@@ -89,7 +88,5 @@ out_simple_2 <- SuppressDominantCells(data=df_microdata,
                                       action_unused_dots = "none", # for GaussSuppression ver. 1.2.0
                                       forcedInOutput = FALSE)
 
-
-
-# Sum of exact disclosures 
+#Sum of exact disclosures 
 sum(out_simple_2[out_simple_2$primary, "up"] - out_simple_2[out_simple_2$primary, "lo"] == 0, na.rm = TRUE)

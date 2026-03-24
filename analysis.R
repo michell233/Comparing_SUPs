@@ -31,6 +31,9 @@ result_list <- list(tab_gauss, out_tau_2, out_simple_2)
 #merge with reduce()
 df_merged <- reduce(result_list, left_join, by = vars)
 
-
+#TODO
 #calculate class/number of @s for importance_score
 
+#Protectedness:
+#For how many primary suppressed cells [lo, up] is OK, i.e  
+#[lomax_response, upmin_response] is covered by [lo, up]?
