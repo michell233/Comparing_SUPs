@@ -49,6 +49,7 @@ tab_gauss <- SuppressDominantCells(data=df_microdata,
                                    protectionIntervals = TRUE, 
                                    intervalSuppression = FALSE)
 
+tab_gauss <- add_mean_n_at(tab_gauss, hrc_GAUSS)
 ######Just GAUSS Suppression for measuring actual time needed
 start_time_GAUSS <- Sys.time()
 tab_gauss_2 <- SuppressDominantCells(data=df_microdata,

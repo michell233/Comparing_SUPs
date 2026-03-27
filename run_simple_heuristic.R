@@ -88,5 +88,8 @@ out_simple_2 <- SuppressDominantCells(data=df_microdata,
                                       action_unused_dots = "none", # for GaussSuppression ver. 1.2.0
                                       forcedInOutput = FALSE)
 
+out_simple_2 <-  out_simple_2 %>% 
+  mutate(suppressed = ifelse(is.na(suppressed),T,suppressed))
+
 #Sum of exact disclosures 
 sum(out_simple_2[out_simple_2$primary, "up"] - out_simple_2[out_simple_2$primary, "lo"] == 0, na.rm = TRUE)

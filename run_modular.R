@@ -109,3 +109,6 @@ out_tau_2 <- SuppressDominantCells(data=df_microdata,
                                    hidden = hidden_tau,
                                    taudata = out_tau,
                                    lpPackage = "highs")
+#Somehow some secondaries come back as NAs 
+out_tau_2 <-  out_tau_2 %>% 
+  mutate(suppressed = ifelse(is.na(suppressed),T,suppressed))

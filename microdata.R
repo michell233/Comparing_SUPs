@@ -92,7 +92,6 @@ clean_up <- function(x){
 }
 ###
 clean_up()
-
 # -----------------------------
 # Build hierarchy 1
 # -----------------------------
@@ -113,6 +112,8 @@ write_argus_hrc(hier1_df)
 # -----------------------------
 # Build hierarchy 2
 # -----------------------------
+# hier2_df <- region
+# write_argus_hrc(hier2_df)
 spec2 <- list(
   TOTAL = 7,
   "01"  = 4,
@@ -175,7 +176,7 @@ df_combination <- expand_grid(!!!prime_positions)
 
 #create microdata as a random sample of combinations
 #number of rows
-n_ids <- 800
+n_ids <- 1000
 
 df_microdata <- df_combination %>%
   slice_sample(n = n_ids, replace = TRUE) %>% #draw random combination for each
