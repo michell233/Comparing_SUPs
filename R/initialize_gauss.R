@@ -27,7 +27,7 @@ initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged
       contributorVar = "id",
       pPercent = pvalue,
       allDominance = TRUE,
-      singletonMethod singletonMethod,
+      singletonMethod = singletonMethod,
       protectionIntervals = TRUE, 
       intervalSuppression = FALSE,
       removeEmpty = TRUE)
