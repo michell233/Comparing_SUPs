@@ -3,7 +3,7 @@
 
 if (FALSE) {  # Example 
   hiers <- list(var1 = read_hier("minimal"), var2 = read_hier("table_header"))
-  df <- create_microdata(hiers, n_ids =  20, n_unique = 5)
+  df <- create_microdata(hiers, n_ids =  100, n_unique = 20)
   initialize_gauss("test", df, hiers)
 }
 
@@ -11,7 +11,7 @@ if (FALSE) {  # Example
 
 
 # Function to initialize df_merged and to store a list with df_merged, df_microdata and hierarchies
-initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged", overwrite = FALSE) {
+initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged", overwrite = FALSE, singletonMethod = "numttTtT") {
   
   
   for(nam in names(hierarchies)) {
@@ -27,7 +27,7 @@ initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged
       contributorVar = "id",
       pPercent = pvalue,
       allDominance = TRUE,
-      singletonMethod = "numttTtT",
+      singletonMethod singletonMethod,
       protectionIntervals = TRUE, 
       intervalSuppression = FALSE,
       removeEmpty = TRUE)
