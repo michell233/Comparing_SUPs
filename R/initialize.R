@@ -12,6 +12,12 @@ if (FALSE) {  # Example
 # Function to initialize df_merged and to store a list with df_merged, df_microdata and hierarchies
 initialize <- function(filename, df_microdata, hierarchies, path = "merged", overwrite = FALSE) {
   
+  
+  for(nam in names(hierarchies)) {
+    df_microdata[[nam]] <- toT(df_microdata[[nam]])
+    hierarchies[[nam]][,2] <- toT(hierarchies[[nam]][,2]) 
+  }
+  
   timing <- system.time({
     res <- GaussSuppressionFromData(data = df_microdata, 
                                     hierarchies = hierarchies, 
@@ -41,4 +47,11 @@ saveRDS2 <- function(object, file, overwrite = FALSE, ...) {
   }
   saveRDS(object, file = file, ...)
 }
+
+
+toT <- function(x) {
+  x[toupper(x) == "TOTAL"] <- "T"
+  x
+}
+
 
