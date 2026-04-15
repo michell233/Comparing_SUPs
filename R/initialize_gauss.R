@@ -4,13 +4,14 @@
 if (FALSE) {  # Example 
   hiers <- list(var1 = read_hier("minimal"), var2 = read_hier("table_header"))
   df <- create_microdata(hiers, n_ids =  20, n_unique = 5)
-  initialize("test", df, hiers)
+  initialize_gauss("test", df, hiers)
 }
 
 
 
+
 # Function to initialize df_merged and to store a list with df_merged, df_microdata and hierarchies
-initialize <- function(filename, df_microdata, hierarchies, path = "merged", overwrite = FALSE) {
+initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged", overwrite = FALSE) {
   
   
   for(nam in names(hierarchies)) {
@@ -19,20 +20,33 @@ initialize <- function(filename, df_microdata, hierarchies, path = "merged", ove
   }
   
   timing <- system.time({
-    res <- GaussSuppressionFromData(data = df_microdata, 
-                                    hierarchies = hierarchies, 
-                                    numVar = "response", 
-                                    primary = NULL, 
-                                    protectZeros = FALSE, 
-                                    removeEmpty = TRUE)
+    res <- GaussSuppression::SuppressDominantCells(
+      data=df_microdata,
+      hierarchies = hierarchies,
+      numVar = "response", 
+      contributorVar = "id",
+      pPercent = pvalue,
+      allDominance = TRUE,
+      singletonMethod = "numttTtT",
+      protectionIntervals = TRUE, 
+      intervalSuppression = FALSE,
+      removeEmpty = TRUE)
   })
   
-  res <- res[!(names(res) %in% c("primary", "suppressed"))]
+  remove_vars <- 
+    c("dominant1", "dominant2", "max1contributor", "max2contributor", "n_non0_contr")
+  
+  res <- res[!(names(res) %in% remove_vars)]
+  
+  method <- "gauss"
+  
+  rename_vars <- names(res) %in% c("primary", "suppressed")
+  names(res)[rename_vars] <- paste( names(res)[rename_vars],  method, sep = "_")
   
   res$method <- NA
   res$elapsed <- NA
   res$error <- NA
-  res$method[1] <- "initial"
+  res$method[1] <-  method 
   res$elapsed[1] <- elapsed <- unname(timing["elapsed"])
   
   all <- list(df_merged = res, df_microdata = df_microdata, hierarchies = hierarchies)
