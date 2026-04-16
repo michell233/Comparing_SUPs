@@ -11,7 +11,7 @@ if (FALSE) {  # Example
 
 
 # Function to initialize df_merged and to store a list with df_merged, df_microdata and hierarchies
-initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged", overwrite = FALSE, singletonMethod = "numttTtT") {
+initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged", overwrite = FALSE, singletonMethod = "numttTtT", pvalue = 5) {
   
   
   for(nam in names(hierarchies)) {
@@ -48,6 +48,15 @@ initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged
   res$error <- NA
   res$method[1] <-  method 
   res$elapsed[1] <- elapsed <- unname(timing["elapsed"])
+  
+  res <- add_mean_n_at(res, hierarchies)
+  
+  pp <- prime_positions(hierarchies)
+  inner <- rep(TRUE, nrow(res))
+  for (nam in names(pp)) {
+    inner[!(res[[nam]] %in% pp[[nam]])] <- FALSE
+  }
+  res$inner <- inner
   
   all <- list(df_merged = res, df_microdata = df_microdata, hierarchies = hierarchies)
   
