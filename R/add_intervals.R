@@ -51,12 +51,19 @@ add_intervals <- function(filename,
   
   i <- match(NA, df_merged$method)
   
+  
+  cat("\n\n\n")
+  
   print(df_merged[seq_len(i-1), c("method", "elapsed", "error")])
   
-  cat("\n  #####################################################################\n")
-  cat("\n  #############   INTERVAL CALCULATIONS FOR", method, "################\n")
+  cat("\n\n\n  #####################################################################\n")
+  cat("  #############   INTERVAL CALCULATIONS FOR   ################\n")
+  cat("  #############   ", method, "      ################\n")
+  cat("  #####################################################################\n")
   if( length(compute_names) > 1 ) {
-    cat("\n  #  remaining methods:", paste(compute_names[-1], collapse = ", "), "\n")
+    cat("  #  remaining methods:", paste(compute_names[-1], collapse = ", "), "\n\n\n")
+  } else {
+    cat("  ##############  last method         ###############\n\n\n")
   }
   
   
