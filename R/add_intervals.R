@@ -4,16 +4,27 @@
 if (FALSE) {  # Example 
   loc_tauargus <- "C:/TauArgus/TauArgus/TauArgus.exe"
   options(rtauargus.tauargus_exe = loc_tauargus)
+  
+  
+  # All files in the R folder are sourced
+  dir_R <- dir("R", full.names = TRUE)
+  for(i in seq_along(dir_R)) {
+    source(dir_R[i])  
+  }
+  
   hiers <- list(var1 = read_hier("nace_2"), var2 = read_hier("table_header"))
   df <- create_microdata(hiers, n_ids =  10000, n_unique = 1000)
-  initialize_gauss("test2", df, hiers)
-  add_sdcTable("test2", method = "SIMPLEHEURISTIC_OLD")
-  add_sdcTable("test2")
-  add_modular("test2")
-  add_intervals("test2", multiple = FALSE)   # only intervals for one method 
-  head(readRDS("merged/test2.rds")$df_merged, 10)
-  add_intervals("test2")  # intervals for all methods not already computed
-  head(readRDS("merged/test2.rds")$df_merged, 10)
+  info_microdata(df, hiers)
+  path <- "merged"
+  filename <- "test2" 
+  initialize_gauss(filename , df, hiers)
+  add_sdcTable(filename, method = "SIMPLEHEURISTIC_OLD")
+  add_sdcTable(filename)
+  add_modular(filename)
+  add_intervals(filename, multiple = FALSE)   # only intervals for one method 
+  head(readRDS(file.path(path, paste0(filename, ".rds")))$df_merged, 10)
+  add_intervals(filename)  # intervals for all methods not already computed
+  head(readRDS(file.path(path, paste0(filename, ".rds")))$df_merged, 10)
 }
 
 
