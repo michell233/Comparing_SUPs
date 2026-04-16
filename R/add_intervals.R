@@ -15,15 +15,19 @@ if (FALSE) {  # Example
   hiers <- list(var1 = read_hier("nace_2"), var2 = read_hier("table_header"))
   df <- create_microdata(hiers, n_ids =  10000, n_unique = 1000)
   info_microdata(df, hiers)
+  
+  
   path <- "merged"
+  dir.create(path)  # create if the folder does not exist
+  
   filename <- "test2" 
-  initialize_gauss(filename , df, hiers)
-  add_sdcTable(filename, method = "SIMPLEHEURISTIC_OLD")
-  add_sdcTable(filename)
-  add_modular(filename)
+  initialize_gauss(filename , df, hiers, path = path)
+  add_sdcTable(filename, method = "SIMPLEHEURISTIC_OLD", path = path)
+  add_sdcTable(filename, path = path)
+  add_modular(filename, path = path)
   add_intervals(filename, multiple = FALSE)   # only intervals for one method 
   head(readRDS(file.path(path, paste0(filename, ".rds")))$df_merged, 10)
-  add_intervals(filename)  # intervals for all methods not already computed
+  add_intervals(filename, path = path)  # intervals for all methods not already computed
   head(readRDS(file.path(path, paste0(filename, ".rds")))$df_merged, 10)
 }
 
