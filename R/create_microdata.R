@@ -7,6 +7,7 @@ if (FALSE) {  # Example
   df
   cbind(SSBtools::MakeFreq(df[1:2]),
         ppercent = inner_ppercent(df))
+  info_microdata(df, hiers)
 }
 
 
@@ -42,7 +43,7 @@ create_microdata <- function(hiers, n_ids =  1000, n_unique = n_ids/10,
 
 # Helper function that calculates p% values for inner cells 
 # from microdata generated with create_microdata()
-inner_ppercent <- function(df_microdata) {
+inner_ppercent <- function(df_microdata, include_freq = FALSE) {
   vars <- seq_len(ncol(df_microdata) - 2)
   d <- data.frame(a = SSBtools::RowGroups(df_microdata[vars]), r = -df_microdata$response)
   table(d$a)
@@ -50,16 +51,35 @@ inner_ppercent <- function(df_microdata) {
   one_or_two <- tt <= 2
   pp <- rep(0, length(tt))
   d <- d[!(d$a %in% which(one_or_two)), ]
-  d <- SortRows(d)
+  d <- SSBtools::SortRows(d)
   d$r <- -d$r
   tot <- as.vector(rowsum(d$r, group = d$a))
   ma <- match(unique(d$a), d$a)
   m1 <- d$r[ma]
   m2 <- d$r[ma + 1]
   pp[!one_or_two] <- 100 * (tot - m2 - m1)/m1
+  if (include_freq) {
+    return(data.frame(freq = as.vector(tt), ppercent = pp))
+  }
   pp
 }
 
+# Another helper function
+info_microdata <- function(df_microdata, hierarchies, return_frame = FALSE) {
+  n_inner_cells <- prod(sapply(prime_positions(hierarchies), length))
+  ipp <- inner_ppercent(df_microdata, include_freq = TRUE)
+  n_empty <- n_inner_cells - nrow(ipp)
+  n_1 <- sum(ipp$freq == 1)
+  n_2 <- sum(ipp$freq == 2)
+  n_unsafe <- sum(ipp$ppercent < 5)
+  freq_max <- max(ipp$freq)
+  info <- c(n_inner_cells = n_inner_cells, n_empty = n_empty, n_1 = n_1, n_2 = n_2, n_unsafe = n_unsafe, freq_max = freq_max)
+  print(info)
+  if (return_frame) {
+    return(ipp)
+  }
+  invisible(NULL)
+}
 
 
 skewsample_unique <- function(n_unique, dim_sizes, prob_dim = 1/seq_len(1e+05)) {
