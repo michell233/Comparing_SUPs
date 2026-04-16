@@ -74,7 +74,7 @@ add_intervals <- function(filename,
   
   
   timing <- system.time({
-    out  <- SuppressDominantCells(data=df_microdata,
+    out  <- GaussSuppression::SuppressDominantCells(data=df_microdata,
                                   numVar = "response",
                                   hierarchies = hrc_GAUSS,
                                   preAggregate = TRUE,

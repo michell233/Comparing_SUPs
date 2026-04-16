@@ -6,7 +6,6 @@ if (FALSE) {  # Example
   df <- create_microdata(hiers, n_ids =  10000, n_unique = 1000)
   initialize_gauss("test1", df, hiers)
   add_sdcTable("test1")
-  add_modular("test1")
   add_sdcTable("test1", method = "SIMPLEHEURISTIC_OLD")
   all <- readRDS("merged/test1.rds")
   head(all$df_merged)
@@ -32,7 +31,7 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
   hier_names <- names(hrc_GAUSS)
   
   #create sdcProblem object
-  prob.microDat <- makeProblem(
+  prob.microDat <- sdcTable::makeProblem(
     data = df_microdata,
     dimList = hrc_GAUSS,
     freqVarInd = NULL,
@@ -41,13 +40,13 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
     sampWeightInd = NULL)
   
   #primary suppressions
-  prob.microDat <- primarySuppression(prob.microDat,type = "p", p=pvalue, numVarName="response")
+  prob.microDat <- sdcTable::primarySuppression(prob.microDat,type = "p", p=pvalue, numVarName="response")
   
   sdcTable_method <- method
   
   
   timing <- system.time({
-    resSIMPLE <- try(protectTable(prob.microDat, method = sdcTable_method), silent = TRUE)
+    resSIMPLE <- try(sdcTable::protectTable(prob.microDat, method = sdcTable_method), silent = TRUE)
   })
   
   
@@ -65,18 +64,16 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
     df_merged$error[i] <- error
   } else {
     #output data.frame
-    result_simpleheuristic <- getInfo(resSIMPLE, type = "finalData")
-    
-    result_simpleheuristic <<-  result_simpleheuristic
+    result_simpleheuristic <- sdcTable::getInfo(resSIMPLE, type = "finalData")
     
     result_simpleheuristic <- as.data.frame(result_simpleheuristic )
     
-    out_simple <- result_simpleheuristic %>% 
-      mutate(Status = recode(sdcStatus,
+    out_simple <- result_simpleheuristic |> 
+      dplyr::mutate(Status = dplyr::recode(sdcStatus,
                              "s" = 2,
                              "x" = 12,
-                             "u" = 9)) %>% 
-      select(-sdcStatus)
+                             "u" = 9)) |> 
+      dplyr::select(-sdcStatus)
   
       
     out_simple <- as.data.frame(out_simple)

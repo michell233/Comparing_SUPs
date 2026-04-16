@@ -48,7 +48,7 @@ add_modular <- function(filename, path = "merged", output = NULL) {
   #######Call Modular with rtauargus
   
   timing <- system.time({
-    ex1 <- tab_rtauargus(
+    ex1 <- rtauargus::tab_rtauargus(
       tau$tab_modular_input,
       dir_name = "argus_files",
       files_name = "sy1",
@@ -63,9 +63,9 @@ add_modular <- function(filename, path = "merged", output = NULL) {
   })
 
   
-  out_tau <- ex1 %>% 
-    select(starts_with("var"),response,Status) %>% 
-    mutate(Status = recode(Status,
+  out_tau <- ex1 |> 
+    dplyr::select(starts_with("var"),response,Status) |> 
+    dplyr::mutate(Status = dplyr::recode(Status,
                            "V" = 2,
                            "A" = 9,
                            "B" = 9,
@@ -156,10 +156,10 @@ prepare_tauargus_inputs <- function(
   names(tab_modular_input)[names(tab_modular_input) == "primary_gauss"] <- "primary" 
   
   ## 1. Input-Tabelle vorbereiten
-  tab_modular_input <- tab_modular_input  %>%
-    select(starts_with("var"), response, n_contr, primary) %>%
-    mutate(no_pl = primary) %>%   # primaries ohne Schutzlevel
-    filter(response > 0)
+  tab_modular_input <- tab_modular_input  |>
+    dplyr::select(starts_with("var"), response, n_contr, primary) |>
+    dplyr::mutate(no_pl = primary) |>   # primaries ohne Schutzlevel
+    dplyr::filter(response > 0)
   
   ## 2. TauArgus-Pfad setzen
   #options(rtauargus.tauargus_exe = loc_tauargus)
