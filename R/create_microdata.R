@@ -5,7 +5,8 @@ if (FALSE) {  # Example
   hiers <- list(var1 = read_hier("minimal"), var2 = read_hier("table_header"))
   df <- create_microdata(hiers, n_ids =  20, n_unique = 5)
   df
-  SSBtools::MakeFreq(df[1:2])
+  cbind(SSBtools::MakeFreq(df[1:2]),
+        ppercent = inner_ppercent(df))
 }
 
 
@@ -37,6 +38,26 @@ create_microdata <- function(hiers, n_ids =  1000, n_unique = n_ids/10,
   names(d) <- names(hiers)
   d$id <- seq_len(n_ids)
   add_response(d, shape = shape, rnd_seed = rnd_seed)
+}
+
+# Helper function that calculates p% values for inner cells 
+# from microdata generated with create_microdata()
+inner_ppercent <- function(df_microdata) {
+  vars <- seq_len(ncol(df_microdata) - 2)
+  d <- data.frame(a = SSBtools::RowGroups(df_microdata[vars]), r = -df_microdata$response)
+  table(d$a)
+  tt <- table(d$a)
+  one_or_two <- tt <= 2
+  pp <- rep(0, length(tt))
+  d <- d[!(d$a %in% which(one_or_two)), ]
+  d <- SortRows(d)
+  d$r <- -d$r
+  tot <- as.vector(rowsum(d$r, group = d$a))
+  ma <- match(unique(d$a), d$a)
+  m1 <- d$r[ma]
+  m2 <- d$r[ma + 1]
+  pp[!one_or_two] <- 100 * (tot - m2 - m1)/m1
+  pp
 }
 
 
