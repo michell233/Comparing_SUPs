@@ -76,7 +76,7 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
   
   if (inherits(resSIMPLE, "try-error")) {
     ok <- FALSE
-    error <- as.character(res)
+    error <- as.character(resSIMPLE)
     if(!is.null(output)){
       stop(error)
     } 
