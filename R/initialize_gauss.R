@@ -13,7 +13,7 @@ if (FALSE) {  # Example
 # Function to initialize df_merged and to store a list with df_merged, df_microdata and hierarchies
 # Use output = "df_merged" to return a data frame instead 
 initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged", 
-                             overwrite = FALSE, singletonMethod = "numttTtT", 
+                             overwrite = FALSE,  
                              pvalue = 5, output = NULL) {
   
   
@@ -30,7 +30,7 @@ initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged
       contributorVar = "id",
       pPercent = pvalue,
       allDominance = TRUE,
-      singletonMethod = singletonMethod,
+      singletonMethod = "none",
       protectionIntervals = TRUE, 
       intervalSuppression = FALSE,
       removeEmpty = TRUE)
