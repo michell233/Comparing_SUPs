@@ -58,7 +58,8 @@ add_modular <- function(filename, path = "merged", output = NULL) {
       secret_no_pl = "no_pl",
       value = "response",
       freq = "n_contr",
-      totcode = tau$totcode
+      totcode = tau$totcode,
+      suppress = "MOD(1,5,0,0,0)"
     )
   })
 
