@@ -11,7 +11,10 @@ if (FALSE) {  # Example
 
 
 # Function to initialize df_merged and to store a list with df_merged, df_microdata and hierarchies
-initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged", overwrite = FALSE, singletonMethod = "numttTtT", pvalue = 5) {
+# Use output = "df_merged" to return a data frame instead 
+initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged", 
+                             overwrite = FALSE, singletonMethod = "numttTtT", 
+                             pvalue = 5, output = NULL) {
   
   
   for(nam in names(hierarchies)) {
@@ -33,6 +36,8 @@ initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged
       removeEmpty = TRUE)
   })
   
+  res$pvalue <- 100*(1 - res$dominant2) / res$dominant1
+  
   remove_vars <- 
     c("dominant1", "dominant2", "max1contributor", "max2contributor", "n_non0_contr")
   
@@ -42,6 +47,7 @@ initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged
   
   rename_vars <- names(res) %in% c("primary", "suppressed")
   names(res)[rename_vars] <- paste( names(res)[rename_vars],  method, sep = "_")
+  
   
   res$method <- NA
   res$elapsed <- NA
@@ -57,6 +63,10 @@ initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged
     inner[!(res[[nam]] %in% pp[[nam]])] <- FALSE
   }
   res$inner <- inner
+  
+  if(identical(output,  "df_merged")){
+    return(res)
+  }
   
   all <- list(df_merged = res, df_microdata = df_microdata, hierarchies = hierarchies)
   
