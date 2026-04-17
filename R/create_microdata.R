@@ -74,7 +74,8 @@ info_microdata <- function(df_microdata, hierarchies, return_frame = FALSE) {
   n_unsafe <- sum(ipp$ppercent < 5)
   freq_max <- max(ipp$freq)
   info <- c(n_inner_cells = n_inner_cells, n_empty = n_empty, n_1 = n_1, n_2 = n_2, n_unsafe = n_unsafe, freq_max = freq_max)
-  print(info)
+  info[2:5] <- paste0(info[2:5], " (", round(100*info[2:5]/info[1])  ,"%)")
+  print(info, quote = FALSE)
   if (return_frame) {
     return(ipp)
   }
