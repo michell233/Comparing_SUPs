@@ -24,11 +24,18 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
   df_microdata <- all[["df_microdata"]]
   df_merged <- all[["df_merged"]]
 
-  if(method %in% df_merged$method) {
-    stop(paste(method, "output already included"))
+  if (method %in% df_merged$method) {
+    if (is.null(output)) {
+      stop(paste(method, "output already included"))
+    } else {
+      warning(paste(method, "output already included"))
+    }
   }
   
   hier_names <- names(hrc_GAUSS)
+  
+  cat("\n", "[makeProblem..")
+  flush.console()
   
   #create sdcProblem object
   prob.microDat <- sdcTable::makeProblem(
@@ -39,15 +46,27 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
     weightInd = NULL,
     sampWeightInd = NULL)
   
+  
+  
+  cat("] [primarySuppression..")
+  flush.console()
+  
   #primary suppressions
   prob.microDat <- sdcTable::primarySuppression(prob.microDat,type = "p", p=pvalue, numVarName="response")
   
   sdcTable_method <- method
   
   
+  cat("] [protectTable..")
+  flush.console()
+  
+  
   timing <- system.time({
     resSIMPLE <- try(sdcTable::protectTable(prob.microDat, method = sdcTable_method), silent = TRUE)
   })
+  
+  cat("]\n")
+  flush.console()
   
   
   i <- match(NA, df_merged$method)
@@ -92,6 +111,13 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
     df_merged[[primary_method]] <-  primary_tau(out_simple,  df_merged[hier_names])
     df_merged[[suppressed_method]] <- df_merged[[primary_method]] 
     df_merged[[suppressed_method]][hidden_tau(out_simple,  df_merged[hier_names])] <- TRUE
+    
+    
+    ok_primary <- all.equal(df_merged[[primary_method]], df_merged[["primary_gauss"]])
+    
+    if (!isTRUE(ok_primary)) {
+      warning(paste("primary not as gauss:", ok_primary))
+    }
     
   }
   
