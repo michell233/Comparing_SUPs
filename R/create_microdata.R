@@ -65,13 +65,14 @@ inner_ppercent <- function(df_microdata, include_freq = FALSE) {
 }
 
 # Another helper function
-info_microdata <- function(df_microdata, hierarchies, return_frame = FALSE) {
+info_microdata <- function(df_microdata, hierarchies, return_frame = FALSE, 
+                           pvalue = 5) {
   n_inner_cells <- prod(sapply(prime_positions(hierarchies), length))
   ipp <- inner_ppercent(df_microdata, include_freq = TRUE)
   n_empty <- n_inner_cells - nrow(ipp)
   n_1 <- sum(ipp$freq == 1)
   n_2 <- sum(ipp$freq == 2)
-  n_unsafe <- sum(ipp$ppercent < 5)
+  n_unsafe <- sum(ipp$ppercent < pvalue)
   freq_max <- max(ipp$freq)
   info <- c(n_inner_cells = n_inner_cells, n_empty = n_empty, n_1 = n_1, n_2 = n_2, n_unsafe = n_unsafe, freq_max = freq_max)
   info[2:5] <- paste0(info[2:5], " (", round(100*info[2:5]/info[1])  ,"%)")
