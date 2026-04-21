@@ -16,7 +16,9 @@ if (FALSE) {  # Example
 # Use parameter method to chose sdcTable method
 # Use parameter output to return a data frame instead  
 #      output = "out_simple" or output = "df_merged" 
-add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIMPLEHEURISTIC", pvalue = 5) {
+add_sdcTable <- function(filename, path = "merged", output = NULL, 
+                         method = "SIMPLEHEURISTIC", pvalue = 5,
+                         use_external_primary = TRUE) {
   
   all <- readRDS(file.path(path, paste0(filename, ".rds")))
   
@@ -52,7 +54,15 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
   flush.console()
   
   #primary suppressions
-  prob.microDat <- sdcTable::primarySuppression(prob.microDat,type = "p", p=pvalue, numVarName="response")
+  
+  if(use_external_primary) {
+    prob.microDat <- external_primary(prob.microDat, 
+                                      df_external = df_merged, 
+                                      dim_var = hier_names, 
+                                      primary_var = "primary_gauss")
+  } else {
+    prob.microDat <- sdcTable::primarySuppression(prob.microDat,type = "p", p=pvalue, numVarName="response")
+  }
   
   sdcTable_method <- method
   
