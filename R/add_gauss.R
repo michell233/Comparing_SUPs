@@ -12,7 +12,7 @@ if (FALSE) {  # Example
   head(all$df_merged)
 }
 
-# To add suppressed_gauss to the file from primary_gauss precalculated
+# To add suppressed_gauss to the file using precomputed primary_gauss.
 #
 # Use output = "df_merged" to return a data frame instead  
 # 
