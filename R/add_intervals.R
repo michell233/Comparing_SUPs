@@ -19,13 +19,13 @@ if (FALSE) {  # Example
   
   path <- "merged"
   dir.create(path)  # create if the folder does not exist
-  
   filename <- "test2" 
   initialize_gauss(filename , df, hiers, path = path)
+  add_gauss(filename, path = path)
   add_sdcTable(filename, method = "SIMPLEHEURISTIC_OLD", path = path)
   add_sdcTable(filename, path = path)
   add_modular(filename, path = path)
-  add_intervals(filename, multiple = FALSE)   # only intervals for one method 
+  add_intervals(filename, multiple = FALSE, path = path)   # only intervals for one method 
   head(readRDS(file.path(path, paste0(filename, ".rds")))$df_merged, 10)
   add_intervals(filename, path = path)  # intervals for all methods not already computed
   head(readRDS(file.path(path, paste0(filename, ".rds")))$df_merged, 10)
