@@ -57,6 +57,6 @@ external_primary <- function(object, df_external, dim_var, primary_var = "primar
   
   u_index <- not_z[df_external[[primary_var]][ma]]
   
-  sdcTable::setInfo(obj, type = "sdcStatus", index = u_index, input = rep("u", length(u_index)))
+  sdcTable::setInfo(object, type = "sdcStatus", index = u_index, input = rep("u", length(u_index)))
   
 }
