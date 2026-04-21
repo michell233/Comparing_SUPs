@@ -13,6 +13,17 @@ save_hier <- function(hier_name, path = "data") {
 }
 
 
+# Function to generate a simple hierarchy with only a Total 
+# in addition to the input codes.
+simple_hier <- function(n = 2, code_name = "A") {
+  hier <- data.frame(level = rep("@@", n + 1), 
+                     name = paste0(code_name, SSBtools::Number(0:n)))
+  hier$level[1] <- "@"
+  hier$name[1] <- "TOTAL"
+  hier
+}
+
+
 # Hierarchy in standard form converted by sdcHierarchies
 hier_as_df <- function(hier) {
   if (!is.data.frame(hier)) {
