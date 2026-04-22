@@ -12,7 +12,8 @@ if (FALSE) {  # Example
 # to add modular results to the file 
 # Use parameter output to return a data frame instead  
 #      output = "out_tau" or output = "df_merged" 
-add_modular <- function(filename, path = "merged", output = NULL) {
+# split_tab is parameter to rtauargus::tab_rtauargus()
+add_modular <- function(filename, path = "merged", output = NULL, split_tab = FALSE) {
   
   all <- readRDS(file.path(path, paste0(filename, ".rds")))
   
@@ -59,6 +60,7 @@ add_modular <- function(filename, path = "merged", output = NULL) {
       value = "response",
       freq = "n_contr",
       totcode = tau$totcode,
+      split_tab = split_tab,
       suppress = "MOD(1,5,0,0,0)"
     )
   })
