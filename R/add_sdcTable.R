@@ -78,11 +78,7 @@ add_sdcTable <- function(filename, path = "merged", output = NULL,
   cat("]\n")
   flush.console()
   
-  
-  i <- match(NA, df_merged$method)
-  
-  df_merged$method[i] <-  method
-  df_merged$elapsed[i] <- unname(timing["elapsed"])
+  df_merged <- add_info(df_merged, method, timing, try_result = resSIMPLE)
   
   if (inherits(resSIMPLE, "try-error")) {
     ok <- FALSE
@@ -90,7 +86,7 @@ add_sdcTable <- function(filename, path = "merged", output = NULL,
     if(!is.null(output)){
       stop(error)
     } 
-    df_merged$error[i] <- error
+    #df_merged$error[i] <- error
   } else {
     #output data.frame
     result_simpleheuristic <- sdcTable::getInfo(resSIMPLE, type = "finalData")

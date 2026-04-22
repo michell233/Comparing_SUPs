@@ -50,10 +50,7 @@ add_gauss <- function(filename,
     stop("generated table was not identical")
   }
   
-  i <- match(NA, df_merged$method)
-  
-  df_merged$method[i] <-  "gauss"
-  df_merged$elapsed[i] <- unname(timing["elapsed"])
+  df_merged <- add_info(df_merged, "gauss", timing)
   
   df_merged$suppressed_gauss <- out$suppressed 
   

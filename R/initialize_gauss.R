@@ -58,10 +58,12 @@ initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged
   
   
   res$method <- NA
+  res$user <- NA
+  res$system <- NA
   res$elapsed <- NA
   res$error <- NA
-  res$method[1] <-  "init_gauss_primary"
-  res$elapsed[1] <- elapsed <- unname(timing["elapsed"])
+  
+  res <- add_info(res, "init_gauss_primary", timing)
   
   res <- add_mean_n_at(res, hierarchies)
   

@@ -81,13 +81,8 @@ add_modular <- function(filename, path = "merged", output = NULL) {
   tab_gauss$primary_modular <-  primary_tau(out_tau,  tab_gauss[tau$vars])
   tab_gauss$suppressed_modular <- tab_gauss$primary_modular 
   tab_gauss$suppressed_modular[hidden_tau(out_tau,  tab_gauss[tau$vars])] <- TRUE
-  tab_gauss
-  
-  
-  i <- match(NA, tab_gauss$method)
-  
-  tab_gauss$method[i] <-  "modular"
-  tab_gauss$elapsed[i] <- unname(timing["elapsed"])
+
+  tab_gauss <- add_info(tab_gauss, "modular", timing)
   
   if(identical(output,  "df_merged")){
     return(tab_gauss)

@@ -111,8 +111,7 @@ add_intervals <- function(filename,
     stop("generated table was not identical")
   }
   
-  df_merged$method[i] <-  paste0("interval_", method)
-  df_merged$elapsed[i] <- unname(timing["elapsed"])
+  df_merged <- add_info(df_merged, paste0("interval_", method), timing)
   
   df_merged[[paste0("lo_", method)]] <- out$lo
   df_merged[[paste0("up_", method)]] <- out$up
