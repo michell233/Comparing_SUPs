@@ -45,7 +45,10 @@ initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged
   })
   
   res$pvalue <- 100*(1 - res$dominant2) / res$dominant1
-  res$primary <- res$pvalue < pvalue
+  # res$primary <- res$pvalue < pvalue
+  # Instead use lomax_response to avoid boundary issues when pvalue == cutoff
+  # and ensure consistent identification of primary cells
+  res$primary <- !is.na(res$lomax_response)
   
   remove_vars <- 
     c("dominant1", "dominant2", "max1contributor", "max2contributor", "n_non0_contr", "suppressed")
