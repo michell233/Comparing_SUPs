@@ -24,7 +24,7 @@
 #' # if pipe operator is preferred (|> can be replaced by %>%)
 #' b <- a |> add_mean_n_at(hi)
 #' 
-add_mean_n_at <- function(output, hierarchies){
+add_mean_n_at <- function(output, hierarchies, include_HiTaS_Class = TRUE){
   hierarchies <- lapply(hierarchies, add_n_at)
   at_matrix <- matrix(0L, nrow(output), length(hierarchies))
   for(i in 1:length(hierarchies)) {
@@ -32,6 +32,9 @@ add_mean_n_at <- function(output, hierarchies){
     at_matrix[,i] <- hierarchies[[i]][["n_at"]][ma]
   }
   output$mean_n_at <-  rowMeans(at_matrix)
+  if (include_HiTaS_Class) {
+    output$HiTaS_Class <- rowSums(at_matrix -1) 
+  }
   output
 } 
 
