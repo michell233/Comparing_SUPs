@@ -22,7 +22,7 @@ if (FALSE) {  # Example
   path <- "merged"
   dir.create(path)  # create if the folder does not exist
   filename <- "test2" 
-  initialize_gauss(filename , df, hiers, path = path)
+  initialize_gauss(filename , df, hiers, path = path, overwrite = TRUE)
   add_gauss(filename, path = path)
   add_sdcTable(filename, method = "SIMPLEHEURISTIC_OLD", path = path)
   add_sdcTable(filename, path = path)
@@ -31,6 +31,28 @@ if (FALSE) {  # Example
   head(readRDS(file.path(path, paste0(filename, ".rds")))$df_merged, 10)
   add_intervals(filename, path = path)  # intervals for all methods not already computed
   head(readRDS(file.path(path, paste0(filename, ".rds")))$df_merged, 10)
+  
+  
+  
+  # intervals calculated step by step
+  initialize_gauss(filename , df, hiers, path = path, overwrite = TRUE)
+  add_gauss(filename, path = path)
+  add_sdcTable(filename, method = "SIMPLEHEURISTIC_OLD", path = path)
+  add_sdcTable(filename, path = path)
+  add_modular(filename, path = path)
+  add_intervals(filename, path = path, multiple = FALSE, sample_size = 2) 
+  add_intervals(filename, path = path, multiple = FALSE, sample_size = 5)
+  add_intervals(filename, path = path, sample_size = 10)
+  add_intervals(filename, path = path, sample_size = 100)
+  df_merged <- readRDS(file.path(path, paste0(filename, ".rds")))$df_merged
+  head(df_merged, 16)
+  sum(!is.na(df_merged$lo_gauss))
+  sum(!is.na(df_merged$lo_modular))
+  add_intervals(filename, path = path, multiple = FALSE)
+  df_merged <- readRDS(file.path(path, paste0(filename, ".rds")))$df_merged
+  head(df_merged, 16)
+  sum(!is.na(df_merged$lo_gauss))
+  sum(!is.na(df_merged$lo_modular))  # still 100 since multiple = FALSE above 
 }
 
 
@@ -42,11 +64,24 @@ if (FALSE) {  # Example
 #
 # Use output = "df_merged" to return a data frame instead (only one method)  
 # 
+# Use sample_size to calculate intervals only for a sample of primary suppressed cells
+# 
 add_intervals <- function(filename, 
                           path = "merged", 
                           output = NULL, 
                           multiple = TRUE,
-                          lpPackage = "highs") {
+                          lpPackage = "highs", 
+                          sample_size = Inf) {
+  
+  rnd_seed <- 123
+  if (!is.null(rnd_seed)) {
+    if (!exists(".Random.seed"))
+      if (runif(1) < 0)
+        stop("Now seed exists")
+    exitSeed <- .Random.seed
+    on.exit(.Random.seed <<- exitSeed)
+    set.seed(rnd_seed)
+  }
   
   all <- readRDS(file.path(path, paste0(filename, ".rds")))
   
@@ -56,11 +91,25 @@ add_intervals <- function(filename,
   
   method_names <- sub("^suppressed_", "", grep("^suppressed_", names(df_merged), value = TRUE))
   interval_names <- sub("^lo_", "", grep("^lo_", names(df_merged), value = TRUE))
+  
+  n_primary <- sum(df_merged$primary_gauss)
+  
+  if (sample_size > n_primary) {
+    sample_size <- n_primary
+  }
+  for (i in seq_along(interval_names)) {
+    if (sum(!is.na(df_merged[[paste0("lo_", interval_names[i])]])) < sample_size) {
+      interval_names[i] <- NA
+    }
+  }
+  interval_names <- interval_names[!is.na(interval_names)]
+  
+  
   compute_names <- setdiff(method_names, interval_names)
   
 
   if(!length(compute_names)) {
-    stop(paste(method, "All intervals computed"))
+    stop(paste("All intervals computed"))
   }
   
   method <- compute_names[1]
@@ -85,6 +134,21 @@ add_intervals <- function(filename,
   
   
   primary <- df_merged[[paste("primary", method, sep = "_")]]
+  
+  lo_name <- paste0("lo_", method)
+  up_name <- paste0("up_", method)
+  old_intervals <- lo_name %in% names(df_merged)
+  
+  if (sample_size < n_primary) {
+    ind_primary <- which(primary)
+    primary[] <- FALSE
+    ind_primary <- sample(ind_primary, size = sample_size)
+    primary[ind_primary] <- TRUE
+    if (old_intervals) {
+      primary[!is.na(df_merged[[lo_name]])] <- FALSE
+    } 
+  }
+  
   suppressed <- df_merged[[paste("suppressed", method, sep = "_")]]
   forced <- !suppressed 
   hidden <- suppressed  & !primary 
@@ -115,9 +179,15 @@ add_intervals <- function(filename,
   
   df_merged <- add_info(df_merged, paste0("interval_", method), timing)
   
-  df_merged[[paste0("lo_", method)]] <- out$lo
-  df_merged[[paste0("up_", method)]] <- out$up
-  
+  if (old_intervals) {
+    new_rows <- !is.na(out$lo)
+    df_merged[[lo_name]][new_rows] <- out$lo[new_rows]
+    df_merged[[up_name]][new_rows] <- out$up[new_rows]
+  } else {
+    df_merged[[lo_name]] <- out$lo
+    df_merged[[up_name]] <- out$up
+  }
+
   if(identical(output,  "df_merged")){
     return(df_merged)
   }
@@ -127,7 +197,8 @@ add_intervals <- function(filename,
   saveRDS(all, file.path(path, paste0(filename, ".rds")))
   
   if(multiple & length(compute_names) > 1) {
-    add_intervals(filename, path = path, multiple = TRUE)
+    add_intervals(filename, path = path, multiple = TRUE,
+                  lpPackage = lpPackage, sample_size = sample_size)
   } 
   invisible(NULL)
 }
