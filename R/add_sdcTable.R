@@ -16,7 +16,9 @@ if (FALSE) {  # Example
 # Use parameter method to chose sdcTable method
 # Use parameter output to return a data frame instead  
 #      output = "out_simple" or output = "df_merged" 
-add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIMPLEHEURISTIC", pvalue = 5) {
+add_sdcTable <- function(filename, path = "merged", output = NULL, 
+                         method = "SIMPLEHEURISTIC", pvalue = 5,
+                         use_external_primary = TRUE) {
   
   all <- readRDS(file.path(path, paste0(filename, ".rds")))
   
@@ -52,7 +54,15 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
   flush.console()
   
   #primary suppressions
-  prob.microDat <- sdcTable::primarySuppression(prob.microDat,type = "p", p=pvalue, numVarName="response")
+  
+  if(use_external_primary) {
+    prob.microDat <- external_primary(prob.microDat, 
+                                      df_external = df_merged, 
+                                      dim_var = hier_names, 
+                                      primary_var = "primary_gauss")
+  } else {
+    prob.microDat <- sdcTable::primarySuppression(prob.microDat,type = "p", p=pvalue, numVarName="response")
+  }
   
   sdcTable_method <- method
   
@@ -68,11 +78,7 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
   cat("]\n")
   flush.console()
   
-  
-  i <- match(NA, df_merged$method)
-  
-  df_merged$method[i] <-  method
-  df_merged$elapsed[i] <- unname(timing["elapsed"])
+  df_merged <- add_info(df_merged, method, timing, try_result = resSIMPLE)
   
   if (inherits(resSIMPLE, "try-error")) {
     ok <- FALSE
@@ -80,7 +86,7 @@ add_sdcTable <- function(filename, path = "merged", output = NULL, method = "SIM
     if(!is.null(output)){
       stop(error)
     } 
-    df_merged$error[i] <- error
+    #df_merged$error[i] <- error
   } else {
     #output data.frame
     result_simpleheuristic <- sdcTable::getInfo(resSIMPLE, type = "finalData")

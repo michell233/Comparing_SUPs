@@ -12,7 +12,9 @@ if (FALSE) {  # Example
 # to add modular results to the file 
 # Use parameter output to return a data frame instead  
 #      output = "out_tau" or output = "df_merged" 
-add_modular <- function(filename, path = "merged", output = NULL) {
+# split_tab is parameter to rtauargus::tab_rtauargus()
+add_modular <- function(filename, path = "merged", output = NULL, split_tab = FALSE,
+                        add_HiTaS_log_time = TRUE) {
   
   all <- readRDS(file.path(path, paste0(filename, ".rds")))
   
@@ -26,8 +28,8 @@ add_modular <- function(filename, path = "merged", output = NULL) {
   clean_up()
   hrc_names <- paste0("hier",seq_along(hrc_GAUSS),"_df")
   
-  for(i in seq_along(hiers)){
-    write_argus_hrc(hiers[[i]], hrc_names[i])
+  for(i in seq_along(hrc_GAUSS)){
+    write_argus_hrc(hrc_GAUSS[[i]], hrc_names[i])
   }
 
   #Read all hierarchy files
@@ -48,7 +50,7 @@ add_modular <- function(filename, path = "merged", output = NULL) {
   #######Call Modular with rtauargus
   
   timing <- system.time({
-    ex1 <- rtauargus::tab_rtauargus(
+    ex1 <- try(rtauargus::tab_rtauargus(
       tau$tab_modular_input,
       dir_name = "argus_files",
       files_name = "sy1",
@@ -59,35 +61,50 @@ add_modular <- function(filename, path = "merged", output = NULL) {
       value = "response",
       freq = "n_contr",
       totcode = tau$totcode,
+      split_tab = split_tab,
       suppress = "MOD(1,5,0,0,0)"
-    )
+    ), silent = TRUE)
   })
+  
+  ok <- !inherits(ex1, "try-error") 
 
   
-  out_tau <- ex1 |> 
-    dplyr::select(starts_with("var"),response,Status) |> 
-    dplyr::mutate(Status = dplyr::recode(Status,
-                           "V" = 2,
-                           "A" = 9,
-                           "B" = 9,
-                           "C" = 9,
-                           "D" = 12))
+  if (ok) { 
+    out_tau <- ex1 |> 
+      dplyr::select(starts_with("var"),response,Status) |> 
+      dplyr::mutate(Status = dplyr::recode(Status,
+                                           "V" = 2,
+                                           "A" = 9,
+                                           "B" = 9,
+                                           "C" = 9,
+                                           "D" = 12))
+  } else {
+    out_tau <- ex1
+  }
   
   if(identical(output,  "out_tau")){
     return(out_tau)
   }
   
-  
-  tab_gauss$primary_modular <-  primary_tau(out_tau,  tab_gauss[tau$vars])
-  tab_gauss$suppressed_modular <- tab_gauss$primary_modular 
-  tab_gauss$suppressed_modular[hidden_tau(out_tau,  tab_gauss[tau$vars])] <- TRUE
-  tab_gauss
-  
-  
+  if (ok) { 
+    tab_gauss$primary_modular <-  primary_tau(out_tau,  tab_gauss[tau$vars])
+    tab_gauss$suppressed_modular <- tab_gauss$primary_modular 
+    tab_gauss$suppressed_modular[hidden_tau(out_tau,  tab_gauss[tau$vars])] <- TRUE
+  } 
+
   i <- match(NA, tab_gauss$method)
+  tab_gauss <- add_info(tab_gauss, "modular", timing,  try_result = ex1)
   
-  tab_gauss$method[i] <-  "modular"
-  tab_gauss$elapsed[i] <- unname(timing["elapsed"])
+  if(ok & add_HiTaS_log_time) {
+    log_path <- getOption("HiTaS.log_path")
+    if(is.null(log_path)) {
+      warning("No HiTaS_log_time: option HiTaS.log_path is empty")
+    } else {
+      line <- grep("^[ \t]*Totaltime", readLines(file, warn = FALSE), value = TRUE)
+      line <- gsub("\\s+", " ", sub("^\\s*Totaltime:\\s*", "", line))
+      tab_gauss$HiTaS_log_time[i] <- line
+    }
+  }
   
   if(identical(output,  "df_merged")){
     return(tab_gauss)
