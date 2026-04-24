@@ -50,7 +50,7 @@ add_modular <- function(filename, path = "merged", output = NULL, split_tab = FA
   #######Call Modular with rtauargus
   
   timing <- system.time({
-    ex1 <- rtauargus::tab_rtauargus(
+    ex1 <- try(rtauargus::tab_rtauargus(
       tau$tab_modular_input,
       dir_name = "argus_files",
       files_name = "sy1",
@@ -63,32 +63,39 @@ add_modular <- function(filename, path = "merged", output = NULL, split_tab = FA
       totcode = tau$totcode,
       split_tab = split_tab,
       suppress = "MOD(1,5,0,0,0)"
-    )
+    ), silent = TRUE)
   })
+  
+  ok <- !inherits(ex1, "try-error") 
 
   
-  out_tau <- ex1 |> 
-    dplyr::select(starts_with("var"),response,Status) |> 
-    dplyr::mutate(Status = dplyr::recode(Status,
-                           "V" = 2,
-                           "A" = 9,
-                           "B" = 9,
-                           "C" = 9,
-                           "D" = 12))
+  if (ok) { 
+    out_tau <- ex1 |> 
+      dplyr::select(starts_with("var"),response,Status) |> 
+      dplyr::mutate(Status = dplyr::recode(Status,
+                                           "V" = 2,
+                                           "A" = 9,
+                                           "B" = 9,
+                                           "C" = 9,
+                                           "D" = 12))
+  } else {
+    out_tau <- ex1
+  }
   
   if(identical(output,  "out_tau")){
     return(out_tau)
   }
   
-  
-  tab_gauss$primary_modular <-  primary_tau(out_tau,  tab_gauss[tau$vars])
-  tab_gauss$suppressed_modular <- tab_gauss$primary_modular 
-  tab_gauss$suppressed_modular[hidden_tau(out_tau,  tab_gauss[tau$vars])] <- TRUE
+  if (ok) { 
+    tab_gauss$primary_modular <-  primary_tau(out_tau,  tab_gauss[tau$vars])
+    tab_gauss$suppressed_modular <- tab_gauss$primary_modular 
+    tab_gauss$suppressed_modular[hidden_tau(out_tau,  tab_gauss[tau$vars])] <- TRUE
+  } 
 
   i <- match(NA, tab_gauss$method)
-  tab_gauss <- add_info(tab_gauss, "modular", timing)
+  tab_gauss <- add_info(tab_gauss, "modular", timing,  try_result = ex1)
   
-  if(add_HiTaS_log_time) {
+  if(ok & add_HiTaS_log_time) {
     log_path <- getOption("HiTaS.log_path")
     if(is.null(log_path)) {
       warning("No HiTaS_log_time: option HiTaS.log_path is empty")
