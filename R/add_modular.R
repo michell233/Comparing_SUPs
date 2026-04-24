@@ -27,8 +27,8 @@ add_modular <- function(filename, path = "merged", output = NULL, split_tab = FA
   clean_up()
   hrc_names <- paste0("hier",seq_along(hrc_GAUSS),"_df")
   
-  for(i in seq_along(hiers)){
-    write_argus_hrc(hiers[[i]], hrc_names[i])
+  for(i in seq_along(hrc_GAUSS)){
+    write_argus_hrc(hrc_GAUSS[[i]], hrc_names[i])
   }
 
   #Read all hierarchy files
