@@ -13,7 +13,8 @@ if (FALSE) {  # Example
 # Use parameter output to return a data frame instead  
 #      output = "out_tau" or output = "df_merged" 
 # split_tab is parameter to rtauargus::tab_rtauargus()
-add_modular <- function(filename, path = "merged", output = NULL, split_tab = FALSE) {
+add_modular <- function(filename, path = "merged", output = NULL, split_tab = FALSE,
+                        add_HiTaS_log_time = TRUE) {
   
   all <- readRDS(file.path(path, paste0(filename, ".rds")))
   
@@ -84,7 +85,19 @@ add_modular <- function(filename, path = "merged", output = NULL, split_tab = FA
   tab_gauss$suppressed_modular <- tab_gauss$primary_modular 
   tab_gauss$suppressed_modular[hidden_tau(out_tau,  tab_gauss[tau$vars])] <- TRUE
 
+  i <- match(NA, tab_gauss$method)
   tab_gauss <- add_info(tab_gauss, "modular", timing)
+  
+  if(add_HiTaS_log_time) {
+    log_path <- getOption("HiTaS.log_path")
+    if(is.null(log_path)) {
+      warning("No HiTaS_log_time: option HiTaS.log_path is empty")
+    } else {
+      line <- grep("^[ \t]*Totaltime", readLines(file, warn = FALSE), value = TRUE)
+      line <- gsub("\\s+", " ", sub("^\\s*Totaltime:\\s*", "", line))
+      tab_gauss$HiTaS_log_time[i] <- line
+    }
+  }
   
   if(identical(output,  "df_merged")){
     return(tab_gauss)

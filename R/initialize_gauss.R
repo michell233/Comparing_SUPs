@@ -64,6 +64,7 @@ initialize_gauss <- function(filename, df_microdata, hierarchies, path = "merged
   res$user <- NA
   res$system <- NA
   res$elapsed <- NA
+  res$HiTaS_log_time <- NA
   res$error <- NA
   
   res <- add_info(res, "init_gauss_primary", timing)

@@ -4,6 +4,8 @@
 if (FALSE) {  # Example 
   loc_tauargus <- "C:/TauArgus/TauArgus/TauArgus.exe"
   options(rtauargus.tauargus_exe = loc_tauargus)
+  HiTaS_log_path <- "C:/Users/oyl/AppData/Local/Temp"
+  options(HiTaS.log_path  =  HiTaS_log_path)
   
   
   # All files in the R folder are sourced
