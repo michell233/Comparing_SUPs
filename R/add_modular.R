@@ -100,6 +100,7 @@ add_modular <- function(filename, path = "merged", output = NULL, split_tab = FA
     if(is.null(log_path)) {
       warning("No HiTaS_log_time: option HiTaS.log_path is empty")
     } else {
+      file <- file.path(log_path, "HiTaS.log")
       line <- grep("^[ \t]*Totaltime", readLines(file, warn = FALSE), value = TRUE)
       line <- gsub("\\s+", " ", sub("^\\s*Totaltime:\\s*", "", line))
       tab_gauss$HiTaS_log_time[i] <- line
