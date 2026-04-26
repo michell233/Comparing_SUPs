@@ -28,7 +28,8 @@ check_primary <- function(df_microdata, hierarchies,
                           pvalue = 5, 
                           print_info = TRUE,
                           do_check_sdcTable = FALSE) {
-  all <- initialize_gauss("nofile", df_microdata, hierarchies, output = "all")
+  all <- initialize_gauss("nofile", df_microdata, hierarchies, output = "all",
+                          pvalue = pvalue)
   info <- info_output(all$df_merged, all$hierarchies)
   if (print_info) {
     print(info, quote = FALSE)
@@ -36,7 +37,8 @@ check_primary <- function(df_microdata, hierarchies,
   if(!do_check_sdcTable) {
     return(c(all, list(info = info)))
   }
-  output_check <- check_sdcTable(all[[1]], all[[2]], all[[3]])
+  output_check <- check_sdcTable(all[[1]], all[[2]], all[[3]], 
+                                 pvalue = pvalue)
   all$df_merged$primary_sdcTable <- output_check$primary_sdcTable
   c(all, output_check, list(info = info))
 }
