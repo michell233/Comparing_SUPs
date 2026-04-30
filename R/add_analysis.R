@@ -1,6 +1,6 @@
 # To add analysis to the .rds file.
 #
-#  
+# Use output = "analysis" to return analysis instead  
 # 
 
 add_analysis <- function(filename, 
@@ -12,7 +12,10 @@ add_analysis <- function(filename,
   analysis <- list()
   
   
-  result <- all$df_merged
+  result <- all$df_merged |> fix_empty()
+  
+  
+  
   #add importance score for each cell
   result <- result |> 
     dplyr::mutate(importance_score = response / 10^(5 * mean_n_at))
@@ -83,22 +86,24 @@ add_analysis <- function(filename,
   Protectedness_gauss <- result |>
     dplyr::filter(lomax_response > lo_gauss & upmin_response < up_gauss)
   #in percent
-  Protectedness_gauss_percent <- (length(Protectedness_gauss$primary_gauss)/ sum(result$primary_gauss == T)) *100
+  Protectedness_gauss_percent <- (nrow(Protectedness_gauss)/ sum(!is.na(result$lo_gauss))) *100
   #MODULAR
   Protectedness_modular <- result |>
     dplyr::filter(lomax_response > lo_modular & upmin_response < up_modular)
   #in percent
-  Protectedness_modular_percent <- (length(Protectedness_modular$primary_modular)/ sum(result$primary_gauss == T)) *100
+  Protectedness_modular_percent <- (nrow(Protectedness_modular)/ sum(!is.na(result$lo_modular))) *100
   #simple
   Protectedness_simple <- result |>
     dplyr::filter(lomax_response > lo_simpleheuristic & upmin_response < up_simpleheuristic)
   #in percent
-  Protectedness_simple_percent <- (length(Protectedness_simple$primary_modular)/ sum(result$primary_gauss == T)) *100
+  Protectedness_simple_percent <- (nrow(Protectedness_simple)/ sum(!is.na(result$lo_simpleheuristic ))) *100
   #simple
+  Protectedness_simple <<- Protectedness_simple
+  result <<- result
   Protectedness_simple_old <- result |>
     dplyr::filter(lomax_response > lo_simpleheuristic_old & upmin_response < up_simpleheuristic_old)
   #in percent
-  Protectedness_simple_old_percent <- (length(Protectedness_simple_old$primary_modular)/ sum(result$primary_gauss == T)) *100
+  Protectedness_simple_old_percent <- (nrow(Protectedness_simple_old)/ sum(!is.na(result$lo_simpleheuristic_old))) *100
   
   #add to list
   analysis["Protectedness"] <- list(c(Protectedness_gauss_percent,
@@ -129,8 +134,30 @@ add_analysis <- function(filename,
   #add to list
   analysis["Suppressions_by_Class"] <- list(Classes_table)
   
+  if (identical(output, "analysis")) {
+    return(analysis)
+  }
+  
   #add to instance and save
   all[["analysis"]] <- analysis
   saveRDS(all, file.path(path, paste0(filename, ".rds")))
   
 }
+
+
+fix_empty <- function(result) {
+  check_names <- c("lo_gauss", "lo_modular", "lo_simpleheuristic", "lo_simpleheuristic_old", 
+    "primary_modular", "primary_simpleheuristic", "primary_simpleheuristic_old", 
+    "suppressed_gauss", "suppressed_modular", "suppressed_simpleheuristic", 
+    "suppressed_simpleheuristic_old", "unsafe_modular", "unsafe_simpleheuristic", 
+    "unsafe_simpleheuristic_old", "up_gauss", "up_modular", "up_simpleheuristic", 
+    "up_simpleheuristic_old")
+  for (nam in check_names) {
+    if (is.null(result[[nam]])) {
+      result[[nam]] <- 0L
+    }
+  }
+  result
+}
+
+
