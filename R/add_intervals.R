@@ -65,6 +65,8 @@ if (FALSE) {  # Example
 # Use output = "df_merged" to return a data frame instead (only one method)  
 # 
 # Use sample_size to calculate intervals only for a sample of primary suppressed cells
+#
+# Use lpPackage = "sdcTable" to calculate intervals via intervals_by_sdcTable()
 # 
 add_intervals <- function(filename, 
                           path = "merged", 
@@ -153,9 +155,19 @@ add_intervals <- function(filename,
   forced <- !suppressed 
   hidden <- suppressed  & !primary 
   
+  hier_names <- names(hrc_GAUSS)
   
   timing <- system.time({
-    out  <- GaussSuppression::SuppressDominantCells(data=df_microdata,
+    if (lpPackage == "sdcTable") {
+      out <- df_merged[hier_names]
+      out$primary <- primary
+      out$suppressed  <- suppressed
+      intervals <- intervals_by_sdcTable(hrc_GAUSS, 
+                                         df_microdata, 
+                                         out)
+      out <- cbind(out, intervals)
+    } else {
+      out  <- GaussSuppression::SuppressDominantCells(data=df_microdata,
                                   numVar = "response",
                                   hierarchies = hrc_GAUSS,
                                   preAggregate = TRUE,
@@ -167,9 +179,9 @@ add_intervals <- function(filename,
                                   lpPackage = lpPackage, 
                                   removeEmpty = TRUE,
                                   forcedInOutput = FALSE)
+    }
   })
   
-  hier_names <- names(hrc_GAUSS)
   ok <- all.equal(out[hier_names], df_merged[hier_names])
   
   if (!isTRUE(ok)) {
@@ -177,7 +189,7 @@ add_intervals <- function(filename,
     stop("generated table was not identical")
   }
   
-  df_merged <- add_info(df_merged, paste0("interval_", method), timing)
+  df_merged <- add_info(df_merged, paste("interval", method, lpPackage, sum(primary), sep = "_"), timing)
   
   if (old_intervals) {
     new_rows <- !is.na(out$lo)

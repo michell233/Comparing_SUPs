@@ -27,7 +27,11 @@ if (FALSE) {  # Example
   primary <- all[["df_merged"]]$primary_gauss
   
   system.time({
-    b <- intervals_by_sdcTable(all[["hierarchies"]], all[["df_microdata"]], all[["df_merged"]])
+    b <- intervals_by_sdcTable(all[["hierarchies"]], 
+                               all[["df_microdata"]], 
+                               all[["df_merged"]],
+                               primary_var = "primary_gauss",
+                               suppressed_var = "suppressed_gauss")
   })
   
   max(abs(a[primary, ] - b[primary, ]))
@@ -41,7 +45,9 @@ if (FALSE) {  # Example
 # NOTE 2: "response" as  freqVar
 intervals_by_sdcTable <- function(hierarchies,
                                   df_microdata,
-                                  df_merged) {
+                                  df_merged,
+                                  primary_var = "primary",
+                                  suppressed_var = "suppressed") {
   
   hier_names <- names(hierarchies)
   
@@ -63,8 +69,8 @@ intervals_by_sdcTable <- function(hierarchies,
   sdcTable_attack(obj, 
                   df_external = df_merged, 
                   dim_var = hier_names, 
-                  primary_var = "primary_gauss",
-                  suppressed_var = "suppressed_gauss")
+                  primary_var = primary_var,
+                  suppressed_var =  suppressed_var)
   
 }
   
