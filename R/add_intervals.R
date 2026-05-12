@@ -72,8 +72,9 @@ add_intervals <- function(filename,
                           path = "merged", 
                           output = NULL, 
                           multiple = TRUE,
-                          lpPackage = "highs", 
-                          sample_size = Inf) {
+                          lpPackage = "sdcTable", 
+                          sample_size = Inf, 
+                          n_workers = 1) {
   
   rnd_seed <- 123
   if (!is.null(rnd_seed)) {
@@ -164,7 +165,8 @@ add_intervals <- function(filename,
       out$suppressed  <- suppressed
       intervals <- intervals_by_sdcTable(hrc_GAUSS, 
                                          df_microdata, 
-                                         out)
+                                         out,
+                                         n_workers = n_workers)
       out <- cbind(out, intervals)
     } else {
       out  <- GaussSuppression::SuppressDominantCells(data=df_microdata,

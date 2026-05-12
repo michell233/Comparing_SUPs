@@ -47,7 +47,8 @@ intervals_by_sdcTable <- function(hierarchies,
                                   df_microdata,
                                   df_merged,
                                   primary_var = "primary",
-                                  suppressed_var = "suppressed") {
+                                  suppressed_var = "suppressed", 
+                                  n_workers = 1) {
   
   hier_names <- names(hierarchies)
   
@@ -70,7 +71,8 @@ intervals_by_sdcTable <- function(hierarchies,
                   df_external = df_merged, 
                   dim_var = hier_names, 
                   primary_var = primary_var,
-                  suppressed_var =  suppressed_var)
+                  suppressed_var =  suppressed_var, 
+                  n_workers = n_workers)
   
 }
   
@@ -78,7 +80,8 @@ intervals_by_sdcTable <- function(hierarchies,
 # external_primary() extended with suppressed_var
 # then sdcTable::attack
 sdcTable_attack <- function(object, df_external, dim_var, primary_var = "primary",
-                            suppressed_var = "suppressed") {
+                            suppressed_var = "suppressed",
+                            n_workers = 1) {
   
   # NOTE!!!!     ::: used here
   gdf_TRUE <- sdcTable:::g_df(object, addDups = TRUE, addNumVars = FALSE)
@@ -127,7 +130,7 @@ sdcTable_attack <- function(object, df_external, dim_var, primary_var = "primary
   cat(".")
   flush.console()
   
-  df_attack = as.data.frame(sdcTable::attack(object))
+  df_attack = as.data.frame(sdcTable::attack(object, n_workers = n_workers, verbose = TRUE))
   
   cat(".")
   flush.console()
