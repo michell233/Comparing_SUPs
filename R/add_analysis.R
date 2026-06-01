@@ -97,9 +97,6 @@ add_analysis <- function(filename,
     dplyr::filter(lomax_response > lo_simpleheuristic & upmin_response < up_simpleheuristic)
   #in percent
   Protectedness_simple_percent <- (nrow(Protectedness_simple)/ sum(!is.na(result$lo_simpleheuristic ))) *100
-  #simple
-  Protectedness_simple <<- Protectedness_simple
-  result <<- result
   Protectedness_simple_old <- result |>
     dplyr::filter(lomax_response > lo_simpleheuristic_old & upmin_response < up_simpleheuristic_old)
   #in percent
