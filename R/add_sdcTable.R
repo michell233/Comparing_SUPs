@@ -19,6 +19,8 @@ if (FALSE) {  # Example
 # Use output = "prob.microDat" or output = "resSIMPLE" to return sdcTable objects 
 # Use time_limit to set time limit in seconds. Default is 3600. 
 #      Use Inf to avoid time limit. See code below. 
+# Use fatal_error = TRUE to manually add error info to output 
+#     to avoid running the same analysis again 
 add_sdcTable <- function(filename, path = "merged", output = NULL, 
                          method = "SIMPLEHEURISTIC", pvalue = 5,
                          use_external_primary = TRUE,
