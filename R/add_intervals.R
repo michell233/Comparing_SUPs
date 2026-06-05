@@ -218,7 +218,8 @@ add_intervals <- function(filename,
   
   if(multiple & length(compute_names) > 1) {
     add_intervals(filename, path = path, multiple = TRUE,
-                  lpPackage = lpPackage, sample_size = sample_size)
+                  lpPackage = lpPackage, sample_size = sample_size, 
+                  n_workers = n_workers)
   } 
   invisible(NULL)
 }
