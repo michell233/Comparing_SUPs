@@ -128,6 +128,17 @@ add_analysis <- function(filename,
   analysis[["n_output"]] <- nrow(all$df_merged)
   analysis[["max_HiTaS_Class"]] <- max(all$df_merged$HiTaS_Class)
   
+  analysis[["no_secondaries"]] <- add_names_and_NA(analysis[["no_secondaries"]], 
+                                                   analysis[["no_secondaries"]])
+  analysis[["absolute_value"]] <- add_names_and_NA(analysis[["absolute_value"]], 
+                                                   analysis[["no_secondaries"]])
+  analysis[["relative_value"]] <- add_names_and_NA(analysis[["relative_value"]], 
+                                                   analysis[["no_secondaries"]])
+  analysis[["importance_value_surpressed"]] <- add_names_and_NA(analysis[["importance_value_surpressed"]], 
+                                                                analysis[["no_secondaries"]])
+  analysis[["Protectedness"]] <- add_names_and_NA(analysis[["Protectedness"]], 
+                                                  analysis[["no_secondaries"]])
+  
   
   #suppressions by "Class" to evaluate hierarchical damage
   #For GAUSS
@@ -241,3 +252,12 @@ n_0_upper_bound <- function(df, name) {
   sum(up == 0, na.rm = TRUE)
 }
 
+
+add_names_and_NA <- function(
+      x, 
+      no_secondaries, 
+      name = c("gauss", "modular", "simpleheuristic", "simpleheuristic_old")) {
+  names(x) <- name
+  x[no_secondaries %in% c(0, NA)] <- NA
+  x
+}
