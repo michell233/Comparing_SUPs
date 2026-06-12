@@ -25,6 +25,7 @@ add_sdcTable <- function(filename, path = "merged", output = NULL,
                          method = "SIMPLEHEURISTIC", pvalue = 5,
                          use_external_primary = TRUE,
                          time_limit = 3600,
+                         n_workers = 1,
                          fatal_error = FALSE) {
   
   all <- readRDS(file.path(path, paste0(filename, ".rds")))
@@ -109,7 +110,7 @@ add_sdcTable <- function(filename, path = "merged", output = NULL,
       })  
     } else {
       timing <- system.time({
-        resSIMPLE <- try(sdcTable::protectTable(prob.microDat, method = sdcTable_method), silent = TRUE)
+        resSIMPLE <- try(sdcTable::protectTable(prob.microDat, method = sdcTable_method, n_workers = n_workers), silent = TRUE)
       })
     }
   }
