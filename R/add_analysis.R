@@ -212,7 +212,8 @@ log_time <- function(df, name) {
   if (!length(grep("seconds", s))) {
     return(NA)
   }
-  strsplit(s, split = "seconds")[[1]][1]
+  seconds <- strsplit(s, split = "seconds")[[1]][1]
+  as.numeric(seconds)
 }
 
 
