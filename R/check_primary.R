@@ -46,7 +46,7 @@ check_primary <- function(df_microdata, hierarchies,
 # Generates information from the output. 
 # Information on primary suppression is included, 
 # but not secondary suppression. Similar to info_microdata().
-info_output <- function(df_merged, hierarchies) {
+info_output <- function(df_merged, hierarchies, as_char = TRUE) {
   n_cells <- prod(sapply(hierarchies, nrow))
   n_empty <- n_cells - sum(df_merged$n_contr > 0)
   n_output <- nrow(df_merged)
@@ -55,7 +55,9 @@ info_output <- function(df_merged, hierarchies) {
   n_unsafe <- sum(df_merged$primary_gauss)
   inner_freq_max <- max(df_merged$n_contr[df_merged$inner])
   info <- c(n_cells = n_cells, n_empty = n_empty, n_output = n_output, n_1 = n_1, n_2 = n_2, n_unsafe = n_unsafe, inner_freq_max = inner_freq_max)
-  info[2:6] <- paste0(info[2:6], " (", round(100 * info[2:6]/info[1]), "%)")
+  if(as_char) {
+    info[2:6] <- paste0(info[2:6], " (", round(100 * info[2:6]/info[1]), "%)")
+  }
   # print(info, quote = FALSE)
   info
 }
